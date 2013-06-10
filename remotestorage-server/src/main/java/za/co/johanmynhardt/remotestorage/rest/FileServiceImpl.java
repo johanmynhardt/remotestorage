@@ -122,12 +122,14 @@ public class FileServiceImpl implements FileService {
 	 */
 	private Response getDocument(final String path) {
 		File file = getInternalPath(path);
-		LOG.info("Returning document: " + path);
+		if (file.isDirectory()) return Response.status(Response.Status.NOT_FOUND).entity("Improper request to a non-leaf node.").build();
+		LOG.info("Returning document: " + file);
 		return new ResponseBuilderImpl()
 				.header("Content-Length", file.length())
 				.tag(new EntityTag(Long.valueOf(file.lastModified()).toString()))
 				.type(MediaType.WILDCARD_TYPE)
 				.entity(file)
+				.status(Response.Status.OK)
 				.build();
 	}
 
